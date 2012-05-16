@@ -42,8 +42,8 @@
          reference to one of our string resources.
     -->
     <application
-        android:name="org.selfmotion.SelfMotionApplication"
-        android:label="@string/skeleton_app">
+        android:name="it.polimi.dei.deepse.shopreview.ShopReviewApplication"
+        android:label="@string/shopreview_app">
     	
     	<uses-library android:name="com.google.android.maps" />
         <!--

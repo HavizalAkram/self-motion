@@ -19,7 +19,7 @@
 
 <resources>
     <!-- Simple strings. -->
-    <string name="skeleton_app">ShopReview</string>
+    <string name="shopreview_app">ShopReview</string>
     <string name="back">Back</string>
     <string name="find_prices">Find the best Prices!</string>
     <string name="ok">OK</string>
