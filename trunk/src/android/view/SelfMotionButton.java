@@ -62,16 +62,16 @@ public class SelfMotionButton extends Button implements OnFinishListener, OnClic
 	}
 	
 	@Override
-	public void onSuccess(Goal goal, Map<String, Object> executionData) {
+	public void onSuccess(View view, Goal goal, Map<String, Object> executionData) {
 		if(onFinishListener != null){
-			onFinishListener.onSuccess(goal, executionData);					
+			onFinishListener.onSuccess(this, goal, executionData);					
 		}
 	}
 
 	@Override
-	public void onError() {
+	public void onError(View view) {
 		if(onFinishListener != null){
-			onFinishListener.onError();					
+			onFinishListener.onError(this);					
 		}
 	}
 

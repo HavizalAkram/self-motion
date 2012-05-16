@@ -2,6 +2,8 @@ package org.selfmotion;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 
 import org.dsol.planner.api.Planner;
 import org.dsol.planner.impl.DefaultPlanner;
@@ -10,7 +12,7 @@ import android.app.Application;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
 
-public class SelfMotionApplication extends Application{
+public abstract class SelfMotionApplication extends Application{
 
 	private InputStream abstractActions = null;
 	DefaultPlanner planner = null;
@@ -22,7 +24,14 @@ public class SelfMotionApplication extends Application{
 		int i = this.getResources().getIdentifier("abstract_actions", "raw", this.getPackageName());
 		planner = new DefaultPlanner();
 		initPlanner(i);
+		try {
+			SelfMotion.initConcreteActions(getConcreteActions());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
+	
+	public abstract List<Class> getConcreteActions(); 
 	
 	
 	public void initPlanner(int abstract_actions_resource){

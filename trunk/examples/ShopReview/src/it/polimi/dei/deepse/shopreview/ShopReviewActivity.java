@@ -16,11 +16,6 @@
 
 package it.polimi.dei.deepse.shopreview;
 
-import it.polimi.dei.deepse.shopreview.actions.BarcodeActions;
-import it.polimi.dei.deepse.shopreview.actions.LocationActions;
-import it.polimi.dei.deepse.shopreview.actions.ProductActions;
-import it.polimi.dei.deepse.shopreview.actions.SharePriceActions;
-import it.polimi.dei.deepse.shopreview.actions.ShopReviewActions;
 import it.polimi.dei.deepse.shopreview.domain.OnlinePrice;
 import it.polimi.dei.deepse.shopreview.domain.UserLocation;
 
@@ -91,31 +86,24 @@ public class ShopReviewActivity extends SelfMotionActivity implements
 	 */
 	OnClickListener showPrices = new OnClickListener() {
 		public void onClick(View v) {
-			main_label.setText("Please wait while we try to get the product info...");
+			main_label
+					.setText("Please wait while we try to get the product info...");
 		}
 	};
 
-	@Override
-	public List<Class> getConcreteActions() {
-		List<Class> classes = new ArrayList<Class>();
-		classes.add(ShopReviewActions.class);
-		classes.add(LocationActions.class);
-		classes.add(BarcodeActions.class);
-		classes.add(ProductActions.class);
-		classes.add(SharePriceActions.class);
-		return classes;
-	}
+	Goal firstGoal = new Goal();
+	Goal secondGoal = new Goal();
 
 	@Override
 	public List<Goal> getGoal(View view) {
 		if (view == findPrices) {
 
-			Goal firstGoal = new Goal();
+			firstGoal.clear();
 			firstGoal.add(new Fact("price(productPrice)"));
 			firstGoal.add(new Fact("listOfOnlinePrices(onlinePrices)"));
 			firstGoal.add(new Fact("position(gpsPosition)"));
 
-			Goal secondGoal = new Goal();
+			secondGoal.clear();
 			secondGoal.add(new Fact("price(productPrice)"));
 			secondGoal.add(new Fact("listOfOnlinePrices(onlinePrices)"));
 			secondGoal.add(new Fact("position(userDefinedPosition)"));
@@ -134,17 +122,22 @@ public class ShopReviewActivity extends SelfMotionActivity implements
 	}
 
 	@Override
-	public void onSuccess(Goal goal, Map<String, Object> executionData) {
+	public void onSuccess(View view, Goal goal, Map<String, Object> executionData) {
 		CharSequence result = "";
-		UserLocation position = (UserLocation) executionData.get("gpsPosition");
-		if (position == null) {
-			position = (UserLocation) executionData.get("userDefinedPosition");
+		if(view == findPrices){
+			UserLocation position = null;
+			if (goal.equals(firstGoal)) {
+				position = (UserLocation) executionData.get("gpsPosition");
+			} else if (goal.equals(secondGoal)) {
+				position = (UserLocation) executionData.get("userDefinedPosition");
+			}
+
+			result = Html.fromHtml(createSummary(position,
+					(String) executionData.get("productBarcode"),
+					(String) executionData.get("name"),
+					(String) executionData.get("productPrice"),
+					(List<OnlinePrice>) executionData.get("onlinePrices")));		
 		}
-		result = Html.fromHtml(createSummary(position,
-				(String) executionData.get("productBarcode"),
-				(String) executionData.get("name"),
-				(String) executionData.get("productPrice"),
-				(List<OnlinePrice>) executionData.get("onlinePrices")));
 		main_label.setText(result);
 	}
 
@@ -152,13 +145,12 @@ public class ShopReviewActivity extends SelfMotionActivity implements
 			String productName, String productPrice,
 			List<OnlinePrice> listOfOnlinePrices) {
 
-
 		StringBuffer text = new StringBuffer("<b>PRODUCT</b><br/><br/>");
 		text.append("<b> - UPC: </b>").append(productBarcode).append("<br/>");
 		text.append("<b> - Name: </b>").append(productName).append("<br/>");
 		text.append("<b> - Price: </b>").append(productPrice).append("<br/>");
 
-		if(listOfOnlinePrices != null){
+		if (listOfOnlinePrices != null) {
 			text.append("<b> - Online stores: </b>").append(
 					listOfOnlinePrices.size());
 			OnlinePrice bestPrice = getBestPrice(listOfOnlinePrices);
@@ -170,7 +162,7 @@ public class ShopReviewActivity extends SelfMotionActivity implements
 						.append(bestPrice.getCurrency()).append(")");
 			}
 			text.append("<br/>");
-			text.append("<b> - Your location: </b>").append(position);			
+			text.append("<b> - Your location: </b>").append(position);
 		}
 
 		return text.toString();
@@ -193,7 +185,7 @@ public class ShopReviewActivity extends SelfMotionActivity implements
 	}
 
 	@Override
-	public void onError() {
+	public void onError(View view) {
 		Toast.makeText(this, "Operation cancelled", 5).show();
 		main_label.setText(getResources().getString(R.string.main_label));
 	}

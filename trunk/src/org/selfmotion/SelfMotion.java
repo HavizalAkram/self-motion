@@ -104,7 +104,7 @@ public class SelfMotion {
 				planAndGo();
 			}
 			else{
-				onFinishListener.onError();
+				onFinishListener.onError(null);
 			}
 		}
 	}
@@ -125,7 +125,7 @@ public class SelfMotion {
 			currentLevel++;
 			if(currentLevel == currentPlan.size()){
 				if(onFinishListener != null){
-					onFinishListener.onSuccess(planner.getCurrentGoal(), data);
+					onFinishListener.onSuccess(null, planner.getCurrentGoal(), data);
 				}
 				isRunning = false;
 			}
