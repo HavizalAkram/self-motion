@@ -1,0 +1,1 @@
+Self-adaptive mobile applications
